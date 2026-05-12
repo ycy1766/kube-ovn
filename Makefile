@@ -8,7 +8,7 @@ include makefiles/e2e.mk
 
 COMMA = ,
 
-REGISTRY = kubeovn
+REGISTRY = ycy1766
 DEV_TAG = dev
 RELEASE_TAG = $(shell cat VERSION)
 DEBUG_TAG = $(shell cat VERSION)-debug
