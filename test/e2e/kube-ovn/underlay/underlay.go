@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"os/exec"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -1653,18 +1654,6 @@ func firstIPsForCIDRBlock(cidrBlock string) string {
 	return strings.Join(ips, ",")
 }
 
-func podIPByProtocol(pod *corev1.Pod, protocol string) string {
-	ginkgo.GinkgoHelper()
-
-	for _, podIP := range pod.Status.PodIPs {
-		if util.CheckProtocol(podIP.IP) == protocol {
-			return podIP.IP
-		}
-	}
-	framework.Failf("pod %s/%s has no %s address", pod.Namespace, pod.Name, protocol)
-	return ""
-}
-
 func checkKoOvnTracePolicy(namespace, podName, targetIP, description string, keywords []string) {
 	ginkgo.GinkgoHelper()
 
@@ -1721,13 +1710,13 @@ func checkAddressSetAddresses(asName string, expected, unexpected []string) {
 		}
 
 		for _, address := range expected {
-			if !containsString(addresses, address) {
+			if !slices.Contains(addresses, address) {
 				framework.Logf("address set %s missing expected address %s, current addresses: %v", asName, address, addresses)
 				return false, nil
 			}
 		}
 		for _, address := range unexpected {
-			if containsString(addresses, address) {
+			if slices.Contains(addresses, address) {
 				framework.Logf("address set %s contains unexpected address %s, current addresses: %v", asName, address, addresses)
 				return false, nil
 			}
@@ -1761,15 +1750,6 @@ func getAddressSetAddresses(asName string) ([]string, error) {
 		}
 	}
 	return addresses, nil
-}
-
-func containsString(values []string, target string) bool {
-	for _, value := range values {
-		if value == target {
-			return true
-		}
-	}
-	return false
 }
 
 func checkPolicy(hitPolicyStr string, expectPolicyExist bool, vpcName string) {
